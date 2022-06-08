@@ -1,0 +1,885 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.StringTokenizer;
+ 
+/* Name of the class has to be "Main" only if the class is public. */
+class Codechef extends Thread
+{
+    
+    static Scanner in = new Scanner();
+ 
+    static PrintWriter out = new PrintWriter(System.out);
+ 
+    static StringBuilder ans = new StringBuilder();
+ 
+    static int testCases, lenA, lenB, lenC;
+    
+    static long mod = 1000000007;
+    
+    static long A[], B[], C[];
+    
+    /*
+    
+    triplet condition is x <= y and y >= z 
+    and the function value is : (x + y) * (y + z)
+    f(1, 5, 4) = (1 + 5) * (5 + 4) = 6 * 9 = 54
+    
+    -> 1 2 3
+    -> 5
+    -> 4 5 6
+      = (1, 5, 4) + (1, 5, 5), (2, 5, 4) + (2, 5, 5) + (3, 5, 4) + (3, 5, 5) = 54 + 60 + 63 + 72 + 80 = 399 
+    
+    analysis : 
+      
+      - From A :- 5 >  1, 2, 3
+      - From C :- 5 >= 4, 5
+      - We can make in total 6 pair or 6 function from here.
+      - (X + Y) * (Y + Z) = sum till less than Y(X) + length till the X is less than Y * Y + sum till less than Y(Z) + length till the Z is less than Y * Y  
+      - Bruteforce solution is O(mnk), which is not enough.
+        So we have to use O(lenB * log(max(lenA, lenC))
+      - We have to detect the prefix sum of the array A and array
+        C. As we can detect the every partition summation of the
+        array A and C. Ofcourse our array will be the sorted,as,we try to find the next smallest number present in those array such that they are smaller than the element we are working on b. 
+    
+    */
+    
+    static void solveBrureForce() {
+        
+        long sum = 0;
+        
+        for(int i = 0; i < lenA; ++i) {
+            
+            for(int j = 0; j < lenB; ++j) {
+                
+                for(int k = 0; k < lenC; ++k) {
+                    
+                    if(B[j] >= A[i] && B[j] >= C[k] ) {
+                        
+                        sum += (A[i] + B[j]) * (B[j] + C[k]);
+                        
+                    }
+                    
+                }
+                
+            }
+            
+        }
+        
+        System.out.println(sum);
+        
+    }
+    
+    static void solve() {
+        
+        sort(A, 0, lenA - 1);
+        sort(C, 0, lenC - 1);
+        
+        //print(A);
+        
+        long prefixA[] = new long[lenA];
+        long prefixB[] = new long[lenB];
+        long prefixC[] = new long[lenC];
+        
+        prefix(A, prefixA);
+        prefix(B, prefixB);
+        prefix(C, prefixC);
+        
+        long sum = 0;
+        
+        for(int i = 0; i < lenB; ++i) {
+            
+            long x = B[i];
+            
+            int partA = search(A, x);
+            int partC = search(C, x);
+            
+            if(partA == 0 || partC == 0) {
+                
+                continue;
+                
+            }
+            
+            /*long Bpart = Long.parseLong(sum(( Long.parseLong(mul(partA + "" , x + "")) % mod) + "", (prefixA[partA - 1] % mod) + "")) % mod;
+            long Cpart = Long.parseLong(sum( (Long.parseLong(mul(partC + "" , x + "")) % mod) + "", (prefixC[partC - 1] % mod) + "")) % mod;
+            
+            sum = Long.parseLong(sum(sum + "", (Long.parseLong(mul(Bpart + "" , Cpart + "")) % mod) + "" )) % mod;*/
+            
+            long Bpart = ((partA * x) % mod + prefixA[partA - 1] % mod) % mod;
+            long Cpart = ((partC * x) % mod + prefixC[partC - 1] % mod) % mod;
+            
+            sum = (sum % mod + (Bpart * Cpart) % mod) % mod;
+            
+        }
+        
+        ans.append((sum % mod) ).append("\n");
+        
+    }
+    
+    public void run() {
+        
+      try {    
+        
+        testCases = in.nextInt();
+	    
+	    for(int t = 0; t < testCases; ++t) {
+	        
+	        lenA = in.nextInt();
+	        lenB = in.nextInt();
+	        lenC = in.nextInt();
+	        
+	        A = new long[lenA];
+	        B = new long[lenB];
+	        C = new long[lenC];
+	        
+	        for(int i = 0; i < lenA; ++i) {
+	            
+	            A[i] = in.nextLong();
+	            
+	        }
+	        
+	        for(int i = 0; i < lenB; ++i) {
+	            
+	            B[i] = in.nextLong();
+	            
+	        }
+	        
+	        for(int i = 0; i < lenC; ++i) {
+	            
+	            C[i] = in.nextLong();
+	            
+	        }
+	        
+	        solve();
+	        
+	        //solveBrureForce();
+	        
+	    }
+	    
+	    out.print(ans.toString());
+	    out.flush();
+        
+      } catch(Exception e) {
+          
+          
+      }   
+        
+    }
+    
+	public static void main (String[] args) 
+	{
+	    
+	    new Thread(null, new Codechef(), "Main", 1 << 27).start();
+	    
+	}
+	
+	static void print(long dp[])
+	{
+	    
+	    for(long i : dp) {
+	        
+	        System.out.print(i + " ");
+	        
+	    }
+	    
+	    System.out.println();
+	    
+	}
+	
+	static void prefix(long a[], long prefix[])
+	{
+	    
+	    int n = a.length;
+	    
+	    prefix[0] = a[0];
+	    
+	    for(int i = 1; i < n; ++i) {
+	        
+	        prefix[i] = (prefix[i - 1] + a[i]) % mod;
+	        
+	    }
+	    
+	}
+	
+	static int search(long a[], long x) {
+	    
+	    int left = 0, n = a.length, right = n;
+	    
+	    while(right > left) {
+	        
+	        int mid = (left + right) / 2;
+	        
+	        if(a[mid] <= x) {
+	            
+	            left = mid + 1;
+	            
+	        } else {
+	            
+	            right = mid;
+	            
+	        }
+	        
+	    }
+	    
+	    return left;
+	    
+	}
+	
+    static void swap(char a[], int i, int j) {
+ 
+        char temp = a[i];
+        a[i] = a[j];
+        a[j] = temp;
+ 
+    }
+ 
+    static void printArray(long a[]) {
+ 
+        for (long i : a) {
+ 
+            System.out.print(i + " ");
+ 
+        }
+ 
+        System.out.println();
+ 
+    }
+ 
+    static boolean isSmaller(String str1, String str2) {
+ 
+        int n1 = str1.length(), n2 = str2.length();
+ 
+        if (n1 < n2) {
+            return true;
+        }
+        if (n2 < n1) {
+            return false;
+        }
+ 
+        for (int i = 0; i < n1; i++) {
+            if (str1.charAt(i) < str2.charAt(i)) {
+                return true;
+            } else if (str1.charAt(i) > str2.charAt(i)) {
+                return false;
+            }
+        }
+        return false;
+    }
+ 
+    static String sub(String str1, String str2) {
+ 
+        if (isSmaller(str1, str2)) {
+            String t = str1;
+            str1 = str2;
+            str2 = t;
+        }
+ 
+        String str = "";
+ 
+        int n1 = str1.length(), n2 = str2.length();
+        int diff = n1 - n2;
+ 
+        int carry = 0;
+ 
+        for (int i = n2 - 1; i >= 0; i--) {
+ 
+            int sub
+                    = (((int) str1.charAt(i + diff) - (int) '0')
+                    - ((int) str2.charAt(i) - (int) '0')
+                    - carry);
+            if (sub < 0) {
+                sub = sub + 10;
+                carry = 1;
+            } else {
+                carry = 0;
+            }
+ 
+            str += String.valueOf(sub);
+        }
+ 
+        for (int i = n1 - n2 - 1; i >= 0; i--) {
+            if (str1.charAt(i) == '0' && carry > 0) {
+                str += "9";
+                continue;
+            }
+            int sub = (((int) str1.charAt(i) - (int) '0')
+                    - carry);
+            if (i > 0 || sub > 0) {
+                str += String.valueOf(sub);
+            }
+            carry = 0;
+        }
+ 
+        return new StringBuilder(str).reverse().toString();
+    }
+ 
+    static String sum(String str1, String str2) {
+ 
+        if (str1.length() > str2.length()) {
+            String t = str1;
+            str1 = str2;
+            str2 = t;
+        }
+ 
+        String str = "";
+ 
+        int n1 = str1.length(), n2 = str2.length();
+        int diff = n2 - n1;
+ 
+        int carry = 0;
+ 
+        for (int i = n1 - 1; i >= 0; i--) {
+ 
+            int sum = ((int) (str1.charAt(i) - '0')
+                    + (int) (str2.charAt(i + diff) - '0') + carry);
+            str += (char) (sum % 10 + '0');
+            carry = sum / 10;
+        }
+ 
+        for (int i = n2 - n1 - 1; i >= 0; i--) {
+            int sum = ((int) (str2.charAt(i) - '0') + carry);
+            str += (char) (sum % 10 + '0');
+            carry = sum / 10;
+        }
+ 
+        if (carry > 0) {
+            str += (char) (carry + '0');
+        }
+ 
+        return new StringBuilder(str).reverse().toString();
+    }
+ 
+    static long detect_sum(int i, long a[], long sum) {
+ 
+        if (i >= a.length) {
+ 
+            return sum;
+ 
+        }
+ 
+        return detect_sum(i + 1, a, sum + a[i]);
+ 
+    }
+ 
+    static String mul(String num1, String num2) {
+        int len1 = num1.length();
+        int len2 = num2.length();
+        if (len1 == 0 || len2 == 0) {
+            return "0";
+        }
+ 
+        int result[] = new int[len1 + len2];
+ 
+        int i_n1 = 0;
+        int i_n2 = 0;
+ 
+        for (int i = len1 - 1; i >= 0; i--) {
+            int carry = 0;
+            int n1 = num1.charAt(i) - '0';
+ 
+            i_n2 = 0;
+ 
+            for (int j = len2 - 1; j >= 0; j--) {
+ 
+                int n2 = num2.charAt(j) - '0';
+ 
+                int sum = n1 * n2 + result[i_n1 + i_n2] + carry;
+ 
+                carry = sum / 10;
+ 
+                result[i_n1 + i_n2] = sum % 10;
+ 
+                i_n2++;
+            }
+ 
+            if (carry > 0) {
+                result[i_n1 + i_n2] += carry;
+            }
+ 
+            i_n1++;
+        }
+ 
+        int i = result.length - 1;
+        while (i >= 0 && result[i] == 0) {
+            i--;
+        }
+ 
+        if (i == -1) {
+            return "0";
+        }
+ 
+        String s = "";
+ 
+        while (i >= 0) {
+            s += (result[i--]);
+        }
+ 
+        return s;
+    }
+ 
+    static class Node<T> {
+ 
+        T data;
+ 
+        Node<T> next;
+ 
+        public Node() {
+ 
+            this.next = null;
+ 
+        }
+ 
+        public Node(T data) {
+ 
+            this.data = data;
+ 
+            this.next = null;
+ 
+        }
+ 
+        public T getData() {
+            return data;
+        }
+ 
+        public void setData(T data) {
+            this.data = data;
+        }
+ 
+        public Node<T> getNext() {
+            return next;
+        }
+ 
+        public void setNext(Node<T> next) {
+            this.next = next;
+        }
+ 
+        @Override
+        public String toString() {
+ 
+            return this.getData().toString() + "  ";
+ 
+        }
+ 
+    }
+ 
+    static class ArrayList1<T> {
+ 
+        Node<T> head, tail;
+ 
+        int len;
+ 
+        public ArrayList1() {
+ 
+            this.head = null;
+ 
+            this.tail = null;
+ 
+            this.len = 0;
+ 
+        }
+ 
+        int size() {
+ 
+            return len;
+ 
+        }
+ 
+        boolean isEmpty() {
+ 
+            return len == 0;
+ 
+        }
+ 
+        int indexOf(T data) {
+ 
+            if (isEmpty()) {
+ 
+                throw new ArrayIndexOutOfBoundsException();
+ 
+            }
+ 
+            Node<T> temp = head;
+ 
+            int index = -1, i = 0;
+ 
+            while (temp != null) {
+ 
+                if (temp.getData() == data) {
+ 
+                    index = i;
+ 
+                }
+ 
+                i++;
+ 
+                temp = temp.getNext();
+ 
+            }
+ 
+            return index;
+ 
+        }
+ 
+        void add(T data) {
+ 
+            Node<T> newNode = new Node<>(data);
+ 
+            if (isEmpty()) {
+ 
+                head = newNode;
+ 
+                tail = newNode;
+ 
+                len++;
+ 
+            } else {
+ 
+                tail.setNext(newNode);
+ 
+                tail = newNode;
+ 
+                len++;
+ 
+            }
+ 
+        }
+ 
+        void see() {
+ 
+            if (isEmpty()) {
+ 
+                throw new ArrayIndexOutOfBoundsException();
+ 
+            }
+ 
+            Node<T> temp = head;
+ 
+            while (temp != null) {
+ 
+                out.print(temp.getData().toString() + " ");
+                out.flush();
+ 
+                temp = temp.getNext();
+ 
+            }
+ 
+            out.println();
+            out.flush();
+ 
+        }
+ 
+        void inserFirst(T data) {
+ 
+            Node<T> newNode = new Node<>(data);
+ 
+            Node<T> temp = head;
+ 
+            if (isEmpty()) {
+ 
+                head = newNode;
+                tail = newNode;
+ 
+                len++;
+ 
+            } else {
+ 
+                newNode.setNext(temp);
+ 
+                head = newNode;
+ 
+                len++;
+ 
+            }
+ 
+        }
+ 
+        T get(int index) {
+ 
+            if (isEmpty() || index >= len) {
+ 
+                throw new ArrayIndexOutOfBoundsException();
+ 
+            }
+ 
+            if (index == 0) {
+ 
+                return head.getData();
+ 
+            }
+ 
+            Node<T> temp = head;
+ 
+            int i = 0;
+ 
+            T data = null;
+ 
+            while (temp != null) {
+ 
+                if (i == index) {
+ 
+                    data = temp.getData();
+ 
+                }
+ 
+                i++;
+ 
+                temp = temp.getNext();
+ 
+            }
+ 
+            return data;
+ 
+        }
+ 
+        void addAt(T data, int index) {
+ 
+            if (index >= len) {
+ 
+                throw new ArrayIndexOutOfBoundsException();
+ 
+            }
+ 
+            Node<T> newNode = new Node<>(data);
+ 
+            int i = 0;
+ 
+            Node<T> temp = head;
+ 
+            while (temp.next != null) {
+ 
+                if (i == index) {
+ 
+                    newNode.setNext(temp.next);
+ 
+                    temp.next = newNode;
+ 
+                }
+ 
+                i++;
+ 
+                temp = temp.getNext();
+ 
+            }
+ 
+            //    temp.setNext(temp);
+            len++;
+ 
+        }
+ 
+        void popFront() {
+ 
+            if (isEmpty()) {
+ 
+                throw new ArrayIndexOutOfBoundsException();
+ 
+            }
+ 
+            if (head == tail) {
+ 
+                head = null;
+                tail = null;
+ 
+            } else {
+ 
+                head = head.getNext();
+ 
+            }
+ 
+            len--;
+ 
+        }
+ 
+        void removeAt(int index) {
+ 
+            if (index >= len) {
+ 
+                throw new ArrayIndexOutOfBoundsException();
+ 
+            }
+ 
+            if (index == 0) {
+ 
+                this.popFront();
+ 
+                return;
+ 
+            }
+ 
+            Node<T> temp = head;
+ 
+            int i = 0;
+ 
+            Node<T> n = new Node<>();
+ 
+            while (temp != null) {
+ 
+                if (i == index) {
+ 
+                    n.next = temp.next;
+ 
+                    temp.next = n;
+ 
+                    break;
+ 
+                }
+ 
+                i++;
+ 
+                n = temp;
+ 
+                temp = temp.getNext();
+ 
+            }
+ 
+            tail = n;
+ 
+            --len;
+ 
+        }
+ 
+        void clearAll() {
+ 
+            this.head = null;
+            this.tail = null;
+ 
+        }
+ 
+    }
+ 
+    static void merge(long a[], int left, int right, int mid) {
+ 
+        int n1 = mid - left + 1, n2 = right - mid;
+ 
+        long L[] = new long[n1];
+ 
+        long R[] = new long[n2];
+ 
+        for (int i = 0; i < n1; i++) {
+ 
+            L[i] = a[left + i];
+ 
+        }
+ 
+        for (int i = 0; i < n2; i++) {
+ 
+            R[i] = a[mid + 1 + i];
+ 
+        }
+ 
+        int i = 0, j = 0, k1 = left;
+ 
+        while (i < n1 && j < n2) {
+ 
+            if (L[i] <= R[j]) {
+ 
+                a[k1] = L[i];
+ 
+                i++;
+ 
+            } else {
+ 
+                a[k1] = R[j];
+ 
+                j++;
+ 
+            }
+ 
+            k1++;
+ 
+        }
+ 
+        while (i < n1) {
+ 
+            a[k1] = L[i];
+ 
+            i++;
+ 
+            k1++;
+ 
+        }
+ 
+        while (j < n2) {
+ 
+            a[k1] = R[j];
+ 
+            j++;
+            k1++;
+ 
+        }
+ 
+    }
+ 
+    static void sort(long a[], int left, int right) {
+ 
+        if (left >= right) {
+ 
+            return;
+ 
+        }
+ 
+        int mid = (left + right) / 2;
+ 
+        sort(a, left, mid);
+ 
+        sort(a, mid + 1, right);
+ 
+        merge(a, left, right, mid);
+ 
+    }
+ 
+    static class Scanner {
+ 
+        BufferedReader in;
+        StringTokenizer st;
+ 
+        public Scanner() {
+ 
+            in = new BufferedReader(new InputStreamReader(System.in));
+ 
+        }
+ 
+        String next() throws IOException {
+ 
+            while (st == null || !st.hasMoreElements()) {
+ 
+                st = new StringTokenizer(in.readLine());
+ 
+            }
+ 
+            return st.nextToken();
+ 
+        }
+ 
+        String nextLine() throws IOException {
+ 
+            return in.readLine();
+ 
+        }
+ 
+        int nextInt() throws IOException {
+ 
+            return Integer.parseInt(next());
+ 
+        }
+ 
+        double nextDouble() throws IOException {
+ 
+            return Double.parseDouble(next());
+ 
+        }
+ 
+        long nextLong() throws IOException {
+ 
+            return Long.parseLong(next());
+ 
+        }
+ 
+        void close() throws IOException {
+ 
+            in.close();
+ 
+        }
+ 
+    }
+}
