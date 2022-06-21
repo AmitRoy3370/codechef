@@ -1,0 +1,136 @@
+/* package codechef; // don't place package name! */
+
+import java.util.Scanner;
+
+class Codechef
+{
+    
+    static Scanner in = new Scanner(System.in);
+    
+    static int testCases, n, k;
+    
+    static long a[];
+    
+    /*
+    
+    Graphic view of the problem
+    ---------------------------
+    
+    4 2 5 1 3 5
+    
+    -> 4 + 2 = 06 / 2 = 3
+    -> 5 + 5 = 10 / 2 = 5
+    -> 5 + 1 = 06 / 2 = 3
+    -> 5 + 1 = 06 / 2 = 3     total way = 7
+    -> 5 + 3 = 08 / 2 = 4
+    -> 5 + 3 = 08 / 2 = 4
+    -> 3 + 1 = 04 / 2 = 2
+    
+    solving procedure
+    -----------------
+    
+    * first time make the every element in the array positive
+      by sdding the 10 ^ 3 for every element 
+    
+    * count the number's
+      
+      4 = 1
+      2 = 1
+      1 = 1
+      3 = 1
+      5 = 2
+      
+    * detect the number of pairs it can be generated
+      or how many time we can use them
+      
+      4 = 1 -> 1 * 0 / 2 = 0
+      2 = 1 -> 1 * 0 / 2 = 0
+      1 = 1 -> 1 * 0 / 2 = 0 
+      3 = 1 -> 1 * 0 / 2 = 0
+      5 = 2 -> 2 * 1 / 2 = 1
+    
+    * count the right and from the left
+      
+      4 - 0, 1, 2, 3, 4 = 1 * 1 + 1 * 1 = 2 
+      2 - 0, 1, 2 = 1 * 1 = 1 
+      3 - 0, 1, 2, 3 = 1 * 1 + 1 * 1 = 2 
+      5 - 0, 1, 2, 3, 4, 5 = 1 * 0 + 1 * 0 + 1 * 0 + 1 * 0 + 0 * 0 = 0
+      1 - 0, 1 = 1 * 1 = 1  
+    
+    * total count is the 7
+    
+    */
+    
+    static void solve() {
+        
+        // step 1
+        
+        for(int i = 0; i < n; ++i) {
+            
+            a[i] += 1000;
+            
+        }
+        
+        long count[] = new long[50001];
+        
+        // step 2
+        
+        for(long i : a) {
+            
+            count[(int)i]++;
+            
+        }
+        
+        int N = count.length;
+        
+        long ans = 0;
+        
+        for(int mid = 0; mid < N; ++mid) {
+            
+            if(count[mid] <= 0) {
+                
+                continue;
+                
+            }
+            
+            // step 3
+            
+            ans += (count[mid] * (count[mid] - 1) ) / 2;
+            
+            // step 4
+            
+            for(int x = 1; mid + x < N && mid - x >= 0; ++x) {
+                
+                ans += count[mid + x] * count[mid - x];
+                
+            }
+            
+        }
+        
+        System.out.println(ans);
+        
+    }
+    
+	public static void main (String[] args) 
+	{
+		
+		testCases = in.nextInt();
+		
+		for(int t = 0 ; t < testCases; ++t) {
+		    
+		    n = in.nextInt();
+		    
+		    a = new long[n];
+		    
+		    for(int i = 0; i < n; ++i) {
+		        
+		        a[i] = in.nextLong();
+		        
+		    }
+		    
+		    solve();
+		    
+		}
+		
+	}
+}
