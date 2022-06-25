@@ -1,0 +1,88 @@
+import java.util.Scanner;
+
+class Codechef
+{
+    static Scanner in = new Scanner(System.in);
+    
+    static int testCases, n;
+    
+    static long a[];
+    
+    static void solveBruteforce() {
+        
+        long ans = n;
+        
+        for(int i = 0; i < n; ++i) {
+            
+            int i1 = i;
+            
+            for(int j = i + 1; j < n && i < n; ++j) {
+                
+                if(a[i] <= a[j]) {
+                    
+                    ans++;
+                    
+                    ++i;
+                    
+                } else {
+                    
+                    break;
+                    
+                }
+                
+            }
+            
+            i = i1;
+            
+        }
+        
+        System.out.println(ans);
+        
+    }
+    
+    static void solve() {
+        
+        long ans = 0;
+        
+        for(int i = 0; i < n; ++i) {
+            
+            long len = 1;
+            
+            while(i + 1 < n && a[i] <= a[i + 1]) {
+                
+                ++len;
+                i++;
+                
+            }
+            
+            ans += ((len + 1) * len) / 2;
+            
+        }
+        
+        System.out.println(ans);
+        
+    }
+    
+	public static void main (String[] args) 
+	{
+	    
+	    testCases = in.nextInt();
+	    
+	    for(int t = 0; t < testCases; ++t) {
+	        
+	        n = in.nextInt();
+	        
+	        a = new long[n];
+	        
+	        for(int i = 0; i < n; ++i) {
+	            
+	            a[i] = in.nextLong();
+	            
+	        }
+	        
+	        solve();
+	        
+	    }
+	
+	}
+}
