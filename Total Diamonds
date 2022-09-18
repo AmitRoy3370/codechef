@@ -1,0 +1,86 @@
+import java.util.Scanner;
+
+class Total_Diamonds
+{
+    
+    static Scanner in = new Scanner(System.in);
+    
+    static int testCases, n;
+    
+    static long dp[];
+    
+    static void solve() 
+    {
+        
+        System.out.println(dp[n]);
+        
+    }
+    
+	public static void main (String[] amit)
+	{
+	    
+	    testCases = in.nextInt();
+	    
+	    dp = new long[2000007];
+	    
+	    int len = dp.length;
+	    
+	    long diamond[] = new long[len];
+	    
+	    for(int i = 2; i < len; ++i) 
+	    {
+	        
+	        diamond[i] = diamond_in_room(i);
+	        
+	    }
+	    
+	    long prefix_diamond[] = new long[len];
+	    
+	    for(int i = 2; i < len; ++i) 
+	    {
+	        
+	        prefix_diamond[i] = prefix_diamond[i - 1] + diamond[i];
+	        
+	    }
+	    
+	    for(int i = 1; i <= len / 2; ++i) 
+	    {
+	        
+	        dp[i] = dp[i - 1];
+	        
+	        dp[i] += 2 * (prefix_diamond[2 * i - 1] - prefix_diamond[i]);
+	        
+	        dp[i] += diamond[2 * i];
+	        
+	    }
+	    
+	    for(int t = 0; t < testCases; ++t) 
+	    {
+	        
+	        n = in.nextInt();
+	        
+	        solve();
+	        
+	    }
+	
+	}
+	
+	static long diamond_in_room(long n) 
+	{
+	    
+	    long a[] = new long[2];
+	    
+	    while(n > 0) 
+	    {
+	        
+	        a[(int)(n % 2)] += n % 10;
+	        
+	        n /= 10;
+	        
+	    }
+	    
+	    return Math.abs(a[1] - a[0]);
+	    
+	}
+	
+}
