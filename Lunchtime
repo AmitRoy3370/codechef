@@ -1,0 +1,147 @@
+import java.util.Scanner;
+
+/* Name of the class has to be "Main" only if the class is public. */
+class Codechef
+{
+    /*
+    
+    solve some problem:
+    ....................
+    
+    eg1:
+    
+    1   2   3   4   5 -> index
+    1   2   2   3   2 -> a 
+    -   +   +   *   .
+    
+    - -> no one can seen her
+    + -> both 2 can seen her
+    * -> no one can seen her
+    . -> no one can seen her
+    
+    0   1   1   0   0 -> b array / answer array
+    
+    eg2:
+    
+    1   2   3   4   5   6   7   8   9   10  11  12 -> index
+    1   2   2   3   5   3   3   5   6   4   3   5 -> a 
+    
+    eg3:
+    
+    1   2   3   4   5   6 -> index
+    3   2   2   3   7   6 -> a
+    x   -   -   x   .   =
+    
+    x -> both of them can see each other
+    - -> both of them can see each other
+    . -> none can see them
+    = -> none can see them
+    
+    1   1   1   1   0   0 -> ans array
+    
+    need complexity:
+    ................
+    
+    O(n) / O(nlog(n)) -> standard solution
+    O(n^2) -> bruteforce solution
+    
+    observations:
+    ..............
+    
+    * for bruteforce solution we can just iterate the loop till
+      next of the ith index to the last of the array. When we find
+      the same element of the ith index in the jth index then inc
+      out counting of the ith index and the jth index of the ans
+      array.If the jth index element is greater than the ith index
+      element then we break out this iteration, as we do not need
+      to count the any large element between the two element.
+    
+    
+    
+    */
+    
+    static int testCases, n;
+    
+    static long h[];
+    
+    static Scanner in = new Scanner(System.in);
+    
+    static void bruteforce()
+    {
+        
+        int ans[] = new int[n];
+        
+        for(int i = 0; i < n; ++i) 
+        {
+            
+            for(int j = i + 1; j < n; ++j) 
+            {
+                
+                if(h[i] == h[j]) 
+                {
+                    
+                    ans[i]++;
+                    ans[j]++;
+                    
+                }
+                
+                if(h[j] > h[i]) 
+                {
+                    
+                    break;
+                    
+                }
+                
+            }
+            
+        }
+        
+        print(ans);
+        
+    }
+    
+    static void solve() 
+    {
+        
+        
+        
+    }
+    
+	public static void main (String[] args)
+	{
+	    
+	    testCases = in.nextInt();
+	    
+	    for(int t = 0; t < testCases; ++t) {
+	        
+	        n = in.nextInt();
+	        
+	        h = new long[n];
+	        
+	        for(int i = 0; i < n; ++i) {
+	            
+	            h[i] = in.nextLong();
+	            
+	        }
+	        
+	        bruteforce();
+	        
+	    }
+	
+	}
+	
+	static void print(int a[])
+	{
+	    
+	    for(int i : a)
+	    {
+	        
+	        System.out.print(i + " ");
+	        
+	    }
+	    
+	    System.out.println();
+	    
+	}
+	
+}
