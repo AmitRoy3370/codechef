@@ -1,0 +1,65 @@
+static void solve(int t) {
+        
+        long dpFirst[] = new long[n];
+        long dpSecond[] = new long[n];
+        
+        dpFirst[n - 1] = n - 1;
+        dpSecond[n - 1] = n - 1;
+        
+        for(int i = n - 2; i >= 0; --i) {
+            
+            long best = i;
+            
+            if(a[i] < a[i + 1]) {
+                
+                best = Math.max(best, dpFirst[i + 1]);
+                
+            }
+            
+            if(a[i] < b[i + 1]) {
+                
+                best = Math.max(best, dpSecond[i + 1]);
+                
+            }
+            
+            dpFirst[i] = best;
+            
+            best = i;
+            
+            if(b[i] < a[i + 1]) {
+                
+                best = Math.max(best, dpFirst[i + 1]);
+                
+            }
+            
+            if(b[i] < b[i + 1]) {
+                
+                best = Math.max(best, dpSecond[i + 1]);
+                
+            }
+            
+            dpSecond[i] = best;
+            
+        }
+        
+        sum = 0L;
+        
+        for(int i = 0; i < n; ++i) {
+            
+            long max = Math.max(dpFirst[i], dpSecond[i]);
+            
+            max = max - i + 1;
+            
+            sum += max;
+            
+        }
+        
+        ans.append(sum);
+
+        if (t != testCases) {
+
+            ans.append("\n");
+
+        }
+
+    }
