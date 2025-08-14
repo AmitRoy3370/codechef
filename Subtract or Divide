@@ -1,0 +1,27 @@
+ static void solve(int t) {
+        
+        if(mod(N + "", 2L) == 1L) {
+            
+            sum = Long.parseLong(sum(N + "", "1"));
+            sum /= 2L;
+            
+        } else {
+            
+            sum = N / 2L;
+            
+            N = Long.parseLong(sum(N + "", "3"));
+            N /= 4L;
+            
+            sum = Long.parseLong(sum(sum + "", N + ""));
+            
+        }
+        
+        ans.append(sum);
+
+        if (t != testCases) {
+
+            ans.append("\n");
+
+        }
+
+    }
